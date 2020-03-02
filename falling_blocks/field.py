@@ -2,14 +2,10 @@ import random
 
 import pygame
 
-from config import (BLOCK_SIDE_SIZE, FIELD_START_X, FIELD_START_Y, 
-    FIELD_END_X, FIELD_END_Y, NUMBER_OF_COLS, NUMBER_OF_ROWS, BORDER_THICKNESS,
-    FIGURE_POSITIONS)
 
 class Field:
-    def __init__(self):
-        self.numberOfCols = NUMBER_OF_COLS
-        self.numberOfRows = NUMBER_OF_ROWS
+    def __init__(self, config=None):
+        self.config = config
 
     def drawFigure(self, display, figureInfo):
         for blockPosition, colour in figureInfo:
@@ -17,32 +13,41 @@ class Field:
             pygame.draw.rect(display, colour, pygame.Rect(pixels))
 
     def fillActiveField(self, display):
-        display.fill((0, 0, 0), rect=pygame.Rect(FIELD_START_X, FIELD_START_Y,
-                                                 FIELD_END_X-FIELD_START_X,
-                                                 FIELD_END_Y-FIELD_START_Y))
+        display.fill((0, 0, 0), rect=pygame.Rect(self.config.field_start_x, self.config.field_start_y,
+                                                 self.config.field_end_x-self.config.field_start_x,
+                                                 self.config.field_end_y-self.config.field_start_y))
 
     def translatePositionToPixels(self, position):
-        xStart = FIELD_START_X + position[0] * BLOCK_SIDE_SIZE
-        yStart = FIELD_START_Y + position[1] * BLOCK_SIDE_SIZE
-        return xStart, yStart, BLOCK_SIDE_SIZE, BLOCK_SIDE_SIZE
+        xStart = self.config.field_start_x + position[0] * self.config.block_side_size
+        yStart = self.config.field_start_y + position[1] * self.config.block_side_size
+        return xStart, yStart, self.config.block_side_size, self.config.block_side_size
 
     def drawFieldBorders(self, display):
         # x, y, x_thickness, y_thickness
-        leftBorder = (FIELD_START_X-BORDER_THICKNESS, FIELD_START_Y, BORDER_THICKNESS,
-                      FIELD_END_Y-FIELD_START_Y+BORDER_THICKNESS)
+        leftBorder = (self.config.field_start_x-self.config.border_thickness, self.config.field_start_y, self.config.border_thickness,
+                      self.config.field_end_y-self.config.field_start_y+self.config.border_thickness)
         pygame.draw.rect(display, (255, 255, 255), pygame.Rect(leftBorder))
-        rightBorder = (FIELD_END_X, FIELD_START_Y, BORDER_THICKNESS,
-                       FIELD_END_Y-FIELD_START_Y+BORDER_THICKNESS)
+        rightBorder = (self.config.field_end_x, self.config.field_start_y, self.config.border_thickness,
+                       self.config.field_end_y-self.config.field_start_y+self.config.border_thickness)
         pygame.draw.rect(display, (255, 255, 255), pygame.Rect(rightBorder))
-        bottomBorder = (FIELD_START_X, FIELD_END_Y, FIELD_END_X-FIELD_START_X, BORDER_THICKNESS)
+        bottomBorder = (self.config.field_start_x, self.config.field_end_y, self.config.field_end_x-self.config.field_start_x, self.config.border_thickness)
         pygame.draw.rect(display, (255, 255, 255), pygame.Rect(bottomBorder))
-
-    def getRandomColour(self):
-        return [random.randint(40, 250), random.randint(40, 250), random.randint(40, 250)]
 
     def getRandomFigurePositions(self):
 
-        figureType = random.choice(list(FIGURE_POSITIONS.keys()))
-        return (figureType, 1), FIGURE_POSITIONS.get(figureType).get(1)
+        figure_type = random.choice(list(self.config.figure_positions.keys()))
+        return (figure_type, 1), self.config.figure_positions.get(figure_type).get(1)
+
+    def get_random_figure_name(self, figure_config: dict) -> str:
+        return random.choice(sorted(list(figure_config.keys())))
+
+    def get_first_figure_positions(
+        self, 
+        figure_name: str, 
+        figure_config: dict
+        ) -> list:
+        pos = figure_config.get_figure(figure_name).get(1)
+        return pos
+
 
 

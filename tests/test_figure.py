@@ -36,9 +36,12 @@ def test_figure_move():
     assert res == fig.get_block_info()
 
 
+class Config:
+    number_of_cols = 4
+
 @pytest.fixture
 def static_figure():
-    fig = StaticFigure(num_of_cols=4)
+    fig = StaticFigure(Config)
     c = [0, 0, 0]
     # Add the following static figure
     # 1111

@@ -1,30 +1,38 @@
-FPS = 10
-# fps is 60 and then define another variable how fall the figures fall
+class Config:
+    fps = 10
+    # fps is 60 and then define another variable how fall the figures fall
+    display_size = (600, 700)
+    falling_speed = 2
+    block_side_size = 20
+    field_start_x = 200
+    field_start_y = 300
+    field_end_x = 500
+    field_end_y = 600
 
-DISPLAY_SIZE = (600, 700)
-FALLING_SPEED = 2
+    number_of_cols = (field_end_x - field_start_x) / block_side_size
+    number_of_rows = (field_end_y - field_start_y) / block_side_size
 
-BLOCK_SIDE_SIZE = 20
+    border_thickness = 10
 
-FIELD_START_X = 200
-FIELD_START_Y = 300
+    figure_positions = {
+        'z_figure': {
+            1: [(0, 1), (1, 1), (1, 0), (2, 0)],
+            2: [(0, 0), (0, 1), (1, 1), (1, 2)]
+            },
 
-FIELD_END_X = 500
-FIELD_END_Y = 600
+        'o_figure': {
+            1: [(0, 0), (1, 0), (0, 1), (1, 1)]
+            },
 
-NUMBER_OF_COLS = (FIELD_END_X - FIELD_START_X) / BLOCK_SIDE_SIZE
-NUMBER_OF_ROWS = (FIELD_END_Y - FIELD_START_Y) / BLOCK_SIDE_SIZE
-BORDER_THICKNESS = 10
-
-FIGURE_POSITIONS = {'zFigure': {1: [(0, 1), (1, 1), (1, 0), (2, 0)],
-                                2: [(0, 0), (0, 1), (1, 1), (1, 2)]},
-
-                    'oFigure': {1: [(0, 0), (1, 0), (0, 1), (1, 1)]},
-
-                    'lFigure': {1: [(0, 0), (1, 0), (2, 0), (0, 1)],
-                                2: [(0, 0), (0, 1), (0, 2), (1, 2)],
-                                3: [(2, 0), (0, 1), (1, 1), (2, 1)],
-                                4: [(0, 0), (1, 0), (1, 1), (1, 2)]},
-                                
-                    'iFigure': {1: [(0, 0), (1, 0), (2, 0), (3, 0)],
-                                2: [(0, 0), (0, 1), (0, 2), (0, 3)]}, }
+        'l_figure': {
+            1: [(0, 0), (1, 0), (2, 0), (0, 1)],
+            2: [(0, 0), (0, 1), (0, 2), (1, 2)],
+            3: [(2, 0), (0, 1), (1, 1), (2, 1)],
+            4: [(0, 0), (1, 0), (1, 1), (1, 2)]
+            },
+                    
+        'i_figure': {
+            1: [(0, 0), (1, 0), (2, 0), (3, 0)],
+            2: [(0, 0), (0, 1), (0, 2), (0, 3)]
+            }, 
+        }

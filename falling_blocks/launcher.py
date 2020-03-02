@@ -1,6 +1,6 @@
 import pygame
 
-from config import FPS
+from config import Config
 from controller import GameController
 
 def gameLoop(clock, controller, gameover):
@@ -29,7 +29,7 @@ def gameLoop(clock, controller, gameover):
             gameover = True
             pygame.quit()
 
-        clock.tick(FPS)
+        clock.tick(Config.fps)
 
 
 def main():
@@ -39,7 +39,7 @@ def main():
     #pygame.mixer.init()
     #pygame.mixer.music.load('theme.mp3')
     #pygame.mixer.music.play(0)
-    controller = GameController()
+    controller = GameController(Config)
     controller.startGame()
     gameover = False
     gameLoop(clock, controller, gameover)
