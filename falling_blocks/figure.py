@@ -97,34 +97,41 @@ class FallingFigure(Figure):
         return [(x + dx, y + dy) for x, y in self.get_block_positions()]
 
     def flip(self):
-        figureName, newTypeNumber = self.getNextFigureTypeNumber()
-        refPosition = self.getReferencePoint()
-        newPositions = self.getFlippedFigurePositions(figureName, newTypeNumber, refPosition)
-        self.destroyBlocks()
-        self.add_blocks_from_positions(block_positions=newPositions, colour=self.colour,
-                                    figure_type=(figureName, newTypeNumber))
+        figure_name, new_type_number = self.get_next_figure_type_number()
+        ref_position = self.get_reference_point()
+        new_positions = self.get_flipped_figure_positions(
+            figure_name, 
+            new_type_number, 
+            ref_position
+            )
+        self.destroy_blocks()
+        self.add_blocks_from_positions(
+            block_positions=new_positions, 
+            colour=self.colour, 
+            figure_type=(figure_name, new_type_number)
+            )
 
-    def getNextFigureTypeNumber(self):
-        figureName, typeNumber = self.figure_type[0], self.figure_type[1]
-        possibleTypes = len(self.config.figure_positions.get(figureName).keys())
-        if typeNumber + 1 > possibleTypes:
-            newTypeNumber = 1
+    def get_next_figure_type_number(self):
+        figure_name, type_number = self.figure_type[0], self.figure_type[1]
+        possible_types = len(self.config.figure_positions.get(figure_name).keys())
+        if type_number + 1 > possible_types:
+            new_type_number = 1
         else:
-            newTypeNumber = typeNumber + 1
+            new_type_number = type_number + 1
 
-        return figureName, newTypeNumber
+        return figure_name, new_type_number
 
-    def getReferencePoint(self):
+    def get_reference_point(self):
         positions = self.get_block_positions()
-        minXPosition = min([x for x, y in positions])
-        minYPosition = min([y for x, y in positions])
-        return minXPosition, minYPosition
+        min_x_position = min([x for x, y in positions])
+        min_y_position = min([y for x, y in positions])
+        return min_x_position, min_y_position
 
-    def getFlippedFigurePositions(self, figureName, newTypeNumber, refPosition):
-        relativePositions = self.config.figure_positions.get(figureName).get(newTypeNumber)
-        truePositions = [(x + refPosition[0], y + refPosition[1]) for x, y in relativePositions]
-        return truePositions
+    def get_flipped_figure_positions(self, figure_name, new_type_number, ref_position):
+        relative_positions = self.config.figure_positions.get(figure_name).get(new_type_number)
+        true_positions = [(x + ref_position[0], y + ref_position[1]) for x, y in relative_positions]
+        return true_positions
 
-    def destroyBlocks(self):
+    def destroy_blocks(self):
         self.blocks = []
         self.figure_type = None

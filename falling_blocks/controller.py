@@ -11,104 +11,114 @@ class GameController:
     def __init__(self, config):
         self.config = config
         self.field = Field(config)
-        self.fallingFigure = FallingFigure(config)
-        self.staticFigure = StaticFigure(config)
-        self.fallingSpeedCounter = 0
+        self.falling_figure = FallingFigure(config)
+        self.static_figure = StaticFigure(config)
+        self.falling_speed_counter = 0
 
     def startGame(self):
         self.display = pygame.display.set_mode(self.config.display_size)
-        self.field.drawFieldBorders(self.display)
-        self.spawnFallingFigure()
+        self.field.draw_field_borders(self.display)
+        self.spawn_falling_figure()
 
     def doNextStep(self, movement=None, flip=False):
         """ Perform next steps """
-        if self.fallingFigureReachedBottom() or self.fallingFigureReachedStaticFigure():
-            self.addFallingFigureToStaticFigure()
-            self.reDrawAllFigures()
+        if self.falling_figure_reached_bottom() or \
+            self.falling_figure_reached_static_figure():
 
-        if movement and self.fallingFigure.blocks:
-            if self.isMovementPossible(movement):
-                self.fallingFigure.move(dx=movement)
-                self.reDrawAllFigures()
+            self.add_falling_figure_to_static_figure()
+            self.redraw_all_figures()
 
-        if flip and self.fallingFigure.blocks:
-            self.fallingFigure.flip()
-            self.reDrawAllFigures()
+        if movement and self.falling_figure.blocks:
+            if self.is_movement_possible(movement):
+                self.falling_figure.move(dx=movement)
+                self.redraw_all_figures()
 
-        if self.fallingSpeedCounter > self.config.falling_speed:
-            self.fallingSpeedCounter = 0
-            self.fallingFigure.move(dy=1)
-            self.reDrawAllFigures()
+        if flip and self.falling_figure.blocks:
+            self.falling_figure.flip()
+            self.redraw_all_figures()
 
-        self.fallingSpeedCounter += 1
+        if self.falling_speed_counter > self.config.falling_speed:
+            self.falling_speed_counter = 0
+            self.falling_figure.move(dy=1)
+            self.redraw_all_figures()
+
+        self.falling_speed_counter += 1
 
     def isGameOver(self):
         """ Check if game is over """
-        if self.staticFigureReachedTop():
+        if self.static_figure_reached_top():
             return True
         return False
 
-    def reDrawAllFigures(self):
-        self.field.fillActiveField(self.display)
-        self.field.drawFigure(self.display, self.staticFigure.get_block_info())
-        if self.fallingFigure.blocks:
-            self.field.drawFigure(self.display, self.fallingFigure.get_block_info())
+    def redraw_all_figures(self):
+        self.field.fill_active_field(self.display)
+        self.field.draw_figure(self.display, self.static_figure.get_block_info())
+        if self.falling_figure.blocks:
+            self.field.draw_figure(self.display, self.falling_figure.get_block_info())
 
-    def spawnFallingFigure(self):
-        #figure_name = self.field.get_random_figure_name()
-        figure_type, block_positions = self.field.getRandomFigurePositions()
-        colour = random.choice(list(pygame.color.THECOLORS.values()))
-        self.fallingFigure.add_blocks_from_positions(block_positions=block_positions, colour=colour, figure_type=figure_type)
+    def spawn_falling_figure(self):
+        figure_type, block_positions = self.get_random_figure_positions()
+        colour = [
+            random.randint(10, 256),
+            random.randint(10, 256),
+            random.randint(10, 256)
+        ]
+        self.falling_figure.add_blocks_from_positions(
+            block_positions=block_positions, 
+            colour=colour, 
+            figure_type=figure_type
+            )
 
-    def destroyFigure(self):
-        self.fallingFigure.destroyBlocks()
-
-    def addFallingFigureToStaticFigure(self):
-        self.staticFigure.add_blocks(self.fallingFigure.blocks)
-        self.fallingFigure.destroyBlocks()
+    def add_falling_figure_to_static_figure(self):
+        self.static_figure.add_blocks(self.falling_figure.blocks)
+        self.falling_figure.destroy_blocks()
         # check if a row needs to be destroyed
-        filledRows = self.staticFigure.get_filled_rows()
-        if filledRows:
-            print('filledRows', filledRows)
-            self.staticFigure.delete_rows(filledRows)
-            self.staticFigure.move_all_rows(filledRows)
+        filled_rows = self.static_figure.get_filled_rows()
+        if filled_rows:
+            print('filled_rows', filled_rows)
+            self.static_figure.delete_rows(filled_rows)
+            self.static_figure.move_all_rows(filled_rows)
 
-        self.spawnFallingFigure()
-        self.reDrawAllFigures()
+        self.spawn_falling_figure()
+        self.redraw_all_figures()
 
-    def fallingFigureReachedBottom(self):
-        if any([y == self.config.number_of_rows-1 for x, y in self.fallingFigure.get_block_positions()]):
+    def falling_figure_reached_bottom(self):
+        bottom_row = self.config.number_of_rows - 1
+        for _x, y in self.falling_figure.get_block_positions():
+            if y == bottom_row:
+                return True
+        return False
+
+    def falling_figure_reached_static_figure(self):
+        next_positions = self.falling_figure.get_next_positions(dy=1)
+        current_positions = self.static_figure.get_block_positions()
+        if set(current_positions).intersection(set(next_positions)):
             return True
         return False
 
-    def fallingFigureReachedStaticFigure(self):
-        if set(self.staticFigure.get_block_positions()).intersection(set(self.fallingFigure.get_next_positions(dy=1))):
-            return True
-        return False
-
-    def staticFigureReachedTop(self):
-        yPositions = [y for x, y in self.staticFigure.get_block_positions()]
-        if yPositions and min(yPositions) <= 2: # bug but this works
+    def static_figure_reached_top(self):
+        y_positions = [y for x, y in self.static_figure.get_block_positions()]
+        if y_positions and min(y_positions) <= 2: # bug but this works
             return True
         return False
 
 
-    def isMovementPossible(self, movement):
-        if self.isMovementClippingBorders(movement) or \
-           self.isMovementClippingStaticFigure(movement):
+    def is_movement_possible(self, movement):
+        if self.is_movement_clipping_borders(movement) or \
+           self.is_movement_clipping_static_figure(movement):
             return False
         return True
 
-    def isMovementClippingBorders(self, movement):
-        newPositions = self.fallingFigure.get_next_positions(dx=movement)
-        if any([x < 0 or x > self.config.number_of_cols-1 for x, y in newPositions]):
+    def is_movement_clipping_borders(self, movement):
+        new_positions = self.falling_figure.get_next_positions(dx=movement)
+        if any([x < 0 or x > self.config.number_of_cols-1 for x, y in new_positions]):
             return True
         return False
 
-    def isMovementClippingStaticFigure(self, movement):
-        staticPositions = self.staticFigure.get_block_positions()
-        fallingPositions = self.fallingFigure.get_next_positions(dx=movement)
-        if set(staticPositions).intersection(fallingPositions):
+    def is_movement_clipping_static_figure(self, movement):
+        static_positions = self.static_figure.get_block_positions()
+        falling_positions = self.falling_figure.get_next_positions(dx=movement)
+        if set(static_positions).intersection(falling_positions):
             return True
         return False
 
@@ -116,16 +126,20 @@ class GameController:
         self.message_display('Game Over')
 
     def message_display(self, text):
-        largeText = pygame.font.Font('freesansbold.ttf', 90)
-        TextSurf, TextRect = self._text_objects(text, largeText)
-        TextRect.center = (
+        large_text = pygame.font.Font('freesansbold.ttf', 90)
+        text_surf, text_rect = self._text_objects(text, large_text)
+        text_rect.center = (
             (self.config.display_size[0]/2), 
             (self.config.display_size[1]/2)
             )
-        self.display.blit(TextSurf, TextRect)
+        self.display.blit(text_surf, text_rect)
         pygame.display.update()
         time.sleep(5)
 
     def _text_objects(self, text, font):
-        textSurface = font.render(text, True, (255, 10, 255))
-        return textSurface, textSurface.get_rect()
+        text_surface = font.render(text, True, (255, 10, 255))
+        return text_surface, text_surface.get_rect()
+
+    def get_random_figure_positions(self):
+        figure_type = random.choice(list(self.config.figure_positions.keys()))
+        return (figure_type, 1), self.config.figure_positions.get(figure_type).get(1)
