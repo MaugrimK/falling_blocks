@@ -1,8 +1,8 @@
 # Falling blocks
 
-## Summary
+A python clone of tetris!
 
-A python clone of tetris.
+![](gameplay.gif)
 
 ## Launch the game
 1. Clone the project
@@ -17,6 +17,7 @@ cd falling_blocks
 ```
 4. Launch the game
 ```bash
+set PYTHONPATH=.
 python falling_blocks\launcher.py
 ```
 
